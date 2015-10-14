@@ -1,0 +1,73 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+</head>
+
+<body>
+  
+
+</svg>
+
+<script>
+
+d3.json('http://novlovplov.xyz/api/account/_32452702', function (error, apiData) {
+    var canvas = d3.select("body").append("svg")
+        .attr("width", 500)
+        .attr("height", 500)
+
+    var data = [];
+    data[0] = {y: apiData.startingMMR, x : 0}
+    var max = data[0].y;
+    var min = max;
+    for (var i = 0; i < apiData.Matches.length; i++) {
+        data.push({x: i+1, y: data[data.length - 1].y + apiData.Matches[i].mmrChange})
+        if (data[data.length-1].y > max) {
+            max = data[data.length-1].y
+        }
+        if (data[data.length-1].y < min) {
+            min = data[data.length-1].y
+        }
+    }
+
+
+    var xscale = d3.scale.linear()
+        .domain([0, data.length])
+        .range([0, 500]);
+
+    var yscale = d3.scale.linear()
+        .domain([min, max])
+        .range([500, 0]);
+
+    var xaxis = d3.svg.axis()
+        .scale(xscale)
+        .orient("bottom");
+
+    console.log(data)
+    var group = canvas.append("g")
+        // .call(xaxis)
+        // .attr("transform", "translate(100,100)");
+
+    var line = d3.svg.line()
+        .x(function(d) {
+            console.log(xscale(d.x))
+            return xscale(d.x)})
+        .y(function(d) {return yscale(d.y)})
+
+
+
+    group.selectAll("path")
+        .data([data])
+        .enter()
+            .append("path")
+            .attr("d", line)
+            .attr("fill", "none")
+            .attr("stroke", "black")
+            .attr("stroke-width", 2)
+
+
+});
+</script>
+</body>

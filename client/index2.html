@@ -1,0 +1,47 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+  .chart text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: middle;
+  }
+  </style>
+
+</head>
+
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+  <svg width="800" height="120">
+</svg>
+
+<script>
+d3.json('http://novlovplov.xyz/api/accounts/', function (error, apiData) {
+  var data = [];
+  for (var i = 0; i < apiData.length; i++) {
+    data.push(apiData[i].currentMMR)
+  }
+  console.log(data)
+  var svg = d3.select("svg");
+
+  var circle = svg.selectAll("circle")
+      .data(data);
+
+  var circleEnter = circle.enter().append("circle");
+
+  circleEnter.attr("cy", 60);
+  circleEnter.attr("cx", function(d, i) { return i * 100 + 50; });
+  circleEnter.attr("r", function(d) { return Math.sqrt(d/2); });
+  circle.style("fill", "red");
+  svgEnter.append("text")
+   .attr("dx", function(d){return -20})
+  .text(function(d) {return d;});
+});
+
+</script>
+</body>
