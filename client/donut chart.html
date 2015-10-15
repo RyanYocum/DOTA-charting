@@ -33,12 +33,13 @@
       .append("g")
       .attr("class", "arc");
 
-      console.log(pie)
-
   arcs.append("path")
       .attr("d", arc)
-      .attr("fill", function (d) {console.log(d)
-        return colors(d.value)})
+      .attr("fill", function (d) {return colors(d.value)})
+
+  arcs.append("text")
+      .attr("transform", function (d) {return "translate(" + arc.centroid(d) +")"})
+      .text(function (d) {return d.value})
 
 });
 </script>
