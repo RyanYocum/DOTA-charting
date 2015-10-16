@@ -26,21 +26,24 @@ d3.json('http://novlovplov.xyz/api/accounts/', function (error, apiData) {
   for (var i = 0; i < apiData.length; i++) {
     data.push(apiData[i].currentMMR)
   }
-  console.log(data)
+
   var svg = d3.select("svg");
 
-  var circle = svg.selectAll("circle")
+  var elem = svg.selectAll("g")
       .data(data);
 
-  var circleEnter = circle.enter().append("circle");
+  var elemEnter = elem.enter().append("g");
 
-  circleEnter.attr("cy", 60);
-  circleEnter.attr("cx", function(d, i) { return i * 100 + 50; });
-  circleEnter.attr("r", function(d) { return Math.sqrt(d/2); });
+  var circle = elemEnter.append("circle")
+      .attr("cy", 60)
+      .attr("cx", function(d, i) { return i * 100 + 50; })
+      .attr("r", function(d) { return Math.sqrt(d/2); });
   circle.style("fill", "red");
-  svgEnter.append("text")
-   .attr("dx", function(d){return -20})
-  .text(function(d) {return d;});
+  elemEnter.append("text")
+   .attr("dx", function (d,i) {return i * 100 + 30})
+   .attr("dy", 60)
+  .text(function (d) {return d;})
+  .style("fill", "white")
 });
 
 </script>

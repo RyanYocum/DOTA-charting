@@ -40,6 +40,7 @@
   arcs.append("text")
       .attr("transform", function (d) {return "translate(" + arc.centroid(d) +")"})
       .text(function (d) {return d.value})
+      .style("fill", "white")
 
 });
 </script>
