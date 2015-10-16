@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <link rel="stylesheet" href="./styles.css" />
   <style>
-  .chart text {
+  .text text {
   fill: white;
   font: 10px sans-serif;
   text-anchor: middle;
@@ -17,15 +17,16 @@
 <body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 
-  <svg width="800" height="120">
+  <svg width="800" height="200">
 </svg>
 
 <script>
-d3.json('http://novlovplov.xyz/api/accounts/', function (error, apiData) {
-  var data = [];
-  for (var i = 0; i < apiData.length; i++) {
-    data.push(apiData[i].currentMMR)
-  }
+d3.json('http://novlovplov.xyz/api/accounts/', function (error, data) {
+  // var data = [];
+  // console.log(apiData)
+  // for (var i = 0; i < apiData.length; i++) {
+  //   data.push({value: apiData[i].currentMMR, name: apiData[i].)
+  // }
 
   var svg = d3.select("svg");
 
@@ -37,13 +38,23 @@ d3.json('http://novlovplov.xyz/api/accounts/', function (error, apiData) {
   var circle = elemEnter.append("circle")
       .attr("cy", 60)
       .attr("cx", function(d, i) { return i * 100 + 50; })
-      .attr("r", function(d) { return Math.sqrt(d/2); });
+      .attr("r", function(d) { return Math.sqrt(d.currentMMR/2); });
   circle.style("fill", "red");
+
   elemEnter.append("text")
-   .attr("dx", function (d,i) {return i * 100 + 35})
-   .attr("dy", 65)
-  .text(function (d) {return d;})
-  .style("fill", "white")
+      .attr("dx", function (d,i) {return i * 100 + 50})
+      .attr("dy", 65)
+      .text(function (d) {return d.currentMMR;})
+      .style("fill", "white")
+      .style("text-anchor", "middle");
+
+  elemEnter.append("text")
+      .attr("dx", function (d,i) {return i * 100 + 50})
+      .attr("dy", 150)
+      .text(function (d) {return d.username})
+      .style("fill", "black")
+      .style("text-anchor", "middle");
+
 });
 
 </script>
