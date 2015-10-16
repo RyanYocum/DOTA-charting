@@ -40,8 +40,8 @@ d3.json('http://novlovplov.xyz/api/accounts/', function (error, apiData) {
       .attr("r", function(d) { return Math.sqrt(d/2); });
   circle.style("fill", "red");
   elemEnter.append("text")
-   .attr("dx", function (d,i) {return i * 100 + 30})
-   .attr("dy", 60)
+   .attr("dx", function (d,i) {return i * 100 + 35})
+   .attr("dy", 65)
   .text(function (d) {return d;})
   .style("fill", "white")
 });
