@@ -49,6 +49,7 @@ var yAxis = d3.svg.axis()
     .orient("left");
 
 var line = d3.svg.line()
+    .interpolate("basis")
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.mmr); });
 
@@ -58,21 +59,24 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("http://novlovplov.xyz/api/account/_32452702", function(error, data1) {
+d3.json("http://novlovplov.xyz/api/accounts/", function(error, data1) {
   if (error) throw error;
-  console.log(data1.createdAt)
-  var date = data1.createdAt;
-  console.log(date)
   var data = [];
-  data[0] = {mmr: data1.startingMMR, date: date}
-  for (var i = 0; i < data1.Matches.length; i++) {
-    data[data.length] = {mmr: data[data.length - 1].mmr + data1.Matches[i].mmrChange, date: data1.Matches[i].createdAt}
+  for (var j = 0; j < data1.length; j++) {
+    data[j] = [];
+    data[j][0] = {mmr: data1[j].startingMMR, date: parseDate(data1[j].createdAt)}
+    for (var i = 0; i < data1[j].Matches.length; i++) {
+      data[j][data[j].length] = {mmr: data[j][data[j].length - 1].mmr + data1[j].Matches[i].mmrChange, date: parseDate(data1[j].Matches[i].createdAt)}
+    }
+  // console.log(data)
+  // data.forEach(function(d) {
+  //   d.forEach(function (e) {
+  //     e.date = parseDate(e.date);
+  //     e.mmr = +e.mmr
+  //   })
+  // });
   }
-  console.log(data)
-  data.forEach(function(d) {
-    d.date = parseDate(d.date);
-    d.mmr = +d.mmr;
-  });
+  console.log(data);
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
   y.domain(d3.extent(data, function(d) { return d.mmr; }));
@@ -80,7 +84,7 @@ d3.json("http://novlovplov.xyz/api/account/_32452702", function(error, data1) {
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+      .call(xAxis);data
 
   svg.append("g")
       .attr("class", "y axis")
@@ -92,10 +96,18 @@ d3.json("http://novlovplov.xyz/api/account/_32452702", function(error, data1) {
       .style("text-anchor", "end")
       .text("Matchmaking Rating");
 
-  svg.append("path")
-      .datum(data)
+  var user = svg.selectAll(".user")
+      .data(data)
+      .enter().append("g")
+        .attr("class", "user");
+      // .attr("class", "line")
+      // .attr("d", line);
+
+  user.append("path")
       .attr("class", "line")
-      .attr("d", line);
+      .attr("d", function(d) {console.log(d)
+       return line(d); })
+
 
   var curtain = svg.append('rect')
     .attr('x', -1 * width)
