@@ -12,13 +12,19 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
+    var mindate = new Date(2015,09,3),
+            maxdate = new Date(2015,09,21);
+
 var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
 
+var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00","red","green","black"];
+
 var xScale = d3.time.scale()
+    .domain([mindate,maxdate])
     .range([0, width]);
 
 var yScale = d3.scale.linear()
-    .domain([0,5000])
+    .domain([-200,200])
     .range([height, 0]);
 
 var xAxis = d3.svg.axis()
@@ -60,8 +66,13 @@ var lineGen = d3.svg.line()
 
 d3.json("http://novlovplov.xyz/api/accounts/", function(error, data) {
   if (error) throw error;
-  // console.log(data)
+  console.log(data)
   for (var i = 0; i < data.length; i++) {
+    data[i].Matches.sort(function (a,b) {if (a.createdAt > b.createdAt) {return 1}
+      else if (a.createdAt < b.createdAt) {return -1}
+        else return 0})
+    data[i].Matches.unshift({createdAt: data[0].createdAt, mmrChange: 0})
+    data[i].Matches.push({createdAt: "2015-10-20T23:08:10.108Z", mmrChange: 0})
     for (var j = 0; j < data[i].Matches.length; j++) {
       data[i].Matches[j].date = parseDate(data[i].Matches[j].createdAt);
       if (j > 0) {
@@ -92,7 +103,7 @@ console.log(dataGroup);
     dataGroup.forEach(function(d, i) {
     svg.append('path')
         .attr('d', lineGen(d.values))
-        .attr('stroke', 'blue')
+        .attr('stroke', function (d) {return colors[i]})
         .attr('stroke-width', 2)
         .attr('fill', 'none');
 });
