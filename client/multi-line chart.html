@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
 <body>
 <script>
@@ -14,18 +14,19 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
 
 var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
 
-var x = d3.time.scale()
+var xScale = d3.time.scale()
     .range([0, width]);
 
-var y = d3.scale.linear()
+var yScale = d3.scale.linear()
+    .domain([0,5000])
     .range([height, 0]);
 
 var xAxis = d3.svg.axis()
-    .scale(x)
+    .scale(xScale)
     .orient("bottom");
 
 var yAxis = d3.svg.axis()
-    .scale(y)
+    .scale(yScale)
     .orient("left");
 
 var svg = d3.select("body").append("svg")
@@ -51,15 +52,69 @@ svg.append("g")
 
 var lineGen = d3.svg.line()
   .x(function(d) {
-    return xScale(d.xvalue);
+    return xScale(d.date);
   })
   .y(function(d) {
-    return yScale(d.yvalue);
+    return yScale(d.mmr);
   });
 
-d3.json("http://novlovplov.xyz/api/accounts/", function(error, data1) {
+d3.json("http://novlovplov.xyz/api/accounts/", function(error, data) {
   if (error) throw error;
+  // console.log(data)
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < data[i].Matches.length; j++) {
+      data[i].Matches[j].date = parseDate(data[i].Matches[j].createdAt);
+      if (j > 0) {
+        data[i].Matches[j].mmr = data[i].Matches[j-1].mmr + data[i].Matches[j].mmrChange;
+      }
+      else {
+        data[i].Matches[j].mmr = data[i].Matches[j].mmrChange;
+      }
+    }
+  }
+  var data1 = [];
+  for (var i = 0; i < data.length; i++) {
+    // data1[i] = [];
+    for (var j = 0; j < data[i].Matches.length; j++) {
+      data1.push({username: data[i].username, mmr: data[i].Matches[j].mmr, date: data[i].Matches[j].date});
+    }
+  }
   console.log(data1)
+
+  var dataGroup = d3.nest()
+    .key(function(d) {
+        return d.username;
+    })
+    .entries(data1);
+console.log(dataGroup);
+
+
+    dataGroup.forEach(function(d, i) {
+    svg.append('path')
+        .attr('d', lineGen(d.values))
+        .attr('stroke', 'blue')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none');
+});
+
+  // var group = svg.append("h")
+  //   // .attr("class", "line")
+
+  // group.selectAll("path")
+  //       .data(data[0])
+  //       .enter()
+  //           .append("path")
+  //           .attr("d", lineGen)
+  //           .attr("fill", "none")
+  //           .attr("stroke", "black")
+  //           .attr("stroke-width", 2)
+
+  // console.log(data);
+  // svg.append('path')
+  //   .attr('d', lineGen(data[0].Matches))
+  //   .attr('stroke', 'green')
+  //   .attr('stroke-width', 2)
+  //   .attr('fill', 'none');
 })
 
 </script>
