@@ -1,0 +1,115 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+<script>
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+    var mindate = new Date(2015,09,3),
+            maxdate = new Date(2015,09,21);
+
+var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00","red","green","black"];
+
+var xScale = d3.time.scale()
+    .domain([mindate,maxdate])
+    .range([0, width]);
+
+var yScale = d3.scale.linear()
+    .domain([-200,200])
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient("left");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(0," + height + ")")
+  .call(xAxis);
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+  .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Matchmaking Rating");
+
+var lineGen = d3.svg.line()
+  // .interpolate("basis")
+  .x(function(d) {
+    return xScale(d.date);
+  })
+  .y(function(d) {
+    return yScale(d.mmr);
+  });
+
+d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
+  if (error) throw error;
+  console.log(apiData);
+  var data1 = [];
+  for (var i = 0; i < apiData.length; i++) {
+    if (apiData[i].Matches.length > 0) {
+    apiData[i].Matches.unshift(apiData[i].Matches[0]);
+    apiData[i].Matches[0].createdAt = "2015-10-02T23:08:10.108Z";
+    apiData[i].Matches[0].mmr = 0;
+    for (var j = 0; j < apiData[i].Matches.length; j++) {
+      if (j !== 0) {
+        apiData[i].Matches[j].mmr = apiData[i].Matches[j-1].mmr + apiData[i].Matches[j].mmrChange;
+      }
+    }
+    apiData[i].Matches.push(apiData[i].Matches[apiData[i].Matches.length - 2])
+    apiData[i].Matches[apiData[i].Matches.length - 1].createdAt = "2015-10-22T23:08:10.108Z";
+  }
+  }
+  for (var i = 0; i < apiData.length; i++) {
+    console.log(i)
+    for (var j = 0; j < apiData[i].Matches.length; j++) {
+      if (apiData[i].Matches.length > 0) {
+      data1.push(apiData[i].Matches[j]);
+    }
+    }
+  }
+  console.log(data1);  
+
+  var dataGroup = d3.nest()
+    .key(function(d) {
+        return d._accountID;
+    })
+    .entries(data1);
+console.log(dataGroup);
+
+
+    dataGroup.forEach(function(d, i) {
+    svg.append('path')
+        .attr('d', lineGen(d.values))
+        .attr('stroke', function (d) {return colors[i]})
+        .attr('stroke-width', 2)
+        .attr('fill', 'none');
+});
+
+})
+
+</script>
+</body>
