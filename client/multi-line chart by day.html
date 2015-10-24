@@ -67,38 +67,6 @@ var lineGen = d3.svg.line()
 
 d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
   if (error) throw error;
-//   console.log(apiData);
-//   var data1 = [];
-//   for (var i = 0; i < apiData.length; i++) {
-//     if (apiData[i].Matches.length > 0) {
-//     apiData[i].Matches.unshift(apiData[i].Matches[0]);
-//     apiData[i].Matches[0].createdAt = "2015-10-02T23:08:10.108Z";
-//     apiData[i].Matches[0].mmr = 0;
-//     for (var j = 0; j < apiData[i].Matches.length; j++) {
-//       if (j !== 0) {
-//         apiData[i].Matches[j].mmr = apiData[i].Matches[j-1].mmr + apiData[i].Matches[j].mmrChange;
-//       }
-//     }
-//     apiData[i].Matches.push(apiData[i].Matches[apiData[i].Matches.length - 2])
-//     apiData[i].Matches[apiData[i].Matches.length - 1].createdAt = "2015-10-22T23:08:10.108Z";
-//   }
-//   }
-//   for (var i = 0; i < apiData.length; i++) {
-//     console.log(i)
-//     for (var j = 0; j < apiData[i].Matches.length; j++) {
-//       if (apiData[i].Matches.length > 0) {
-//       data1.push(apiData[i].Matches[j]);
-//     }
-//     }
-//   }
-//   console.log(data1);  
-
-//   var dataGroup = d3.nest()
-//     .key(function(d) {
-//         return d._accountID;
-//     })
-//     .entries(data1);
-// console.log(dataGroup);
 
   var data = []
   for (var i= 0; i < apiData.length; i++) {
@@ -116,7 +84,7 @@ d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
     }
     data[i].values[data[i].values.length] = data[i].values[data[i].values.length - 1]
     data[i].values[data[i].values.length-1].date = parseDate("2015-10-23");
-  }
+  } 
 
   console.log(data)
 
