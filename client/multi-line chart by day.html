@@ -67,26 +67,24 @@ var lineGen = d3.svg.line()
 
 d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
   if (error) throw error;
+  console.log(apiData);
 
-  var data = []
-  for (var i= 0; i < apiData.length; i++) {
-    data[i] = {};
-    data[i].username = apiData[i].username;
-    data[i].values = [];
-    data[i].values[0] = {username: data[i].username, mmr: 0, date: parseDate("2015-10-02")}
-    if (apiData[i].Matches.length) {
-      console.log('hi');
-      for (var j = 0; j < apiData[i].Matches.length; j++) {
-        console.log('hi again');
-        var temp = parseDate(apiData[i].Matches[j].createdAt.slice(0,10));
-        data[i].values[j+1] = {username: data[i].username, mmr: data[i].values[j].mmr + apiData[i].Matches[j].mmrChange, date: temp}
-      }
+  for (var i = 0; i < apiData.length; i++) {
+    apiData[i].Matches.sort(function (a,b) {
+    if (a.date > b.date) {
+      return 1;
     }
-    data[i].values[data[i].values.length] = data[i].values[data[i].values.length - 1]
-    data[i].values[data[i].values.length-1].date = parseDate("2015-10-23");
-  } 
+    if (a.date < b.date) {
+      return -1;
+    }
+    else {
+      return 0;
+    }
+  })
 
-  console.log(data)
+  }
+
+  console.log(apiData)
 
     data.forEach(function(d, i) {
     svg.append('path')
