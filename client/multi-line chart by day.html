@@ -24,7 +24,7 @@ var xScale = d3.time.scale()
     .range([0, width]);
 
 var yScale = d3.scale.linear()
-    .domain([-200,200])
+    .domain([-100,200])
     .range([height, 0]);
 
 var xAxis = d3.svg.axis()
@@ -69,23 +69,62 @@ d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
   if (error) throw error;
   console.log(apiData);
 
+  var data = [];
+
   for (var i = 0; i < apiData.length; i++) {
     apiData[i].Matches.sort(function (a,b) {
-    if (a.date > b.date) {
-      return 1;
+      if (a.date > b.date) {
+        return 1;
+      }
+      if (a.date < b.date) {
+        return -1;
+      }
+      else {
+        return 0;
+      }
+    })
+    for (var j = 0; j < apiData[i].Matches.length; j++) {
+      apiData[i].Matches[j].createdAt = apiData[i].Matches[j].createdAt.slice(0,10);
+      //make edge case for first one
+      if (j > 0 && apiData[i].Matches[j].createdAt === apiData[i].Matches[j-1].createdAt) {
+        apiData[i].Matches[j-1].mmrChange += apiData[i].Matches[j].mmrChange;
+        apiData[i].Matches.splice(j,1);
+        j--;
+      }
     }
-    if (a.date < b.date) {
-      return -1;
+    apiData[i].Matches.unshift({username: apiData[i].username, createdAt: "2015-10-01", mmrChange: 0});
+      apiData[i].Matches.push({username: apiData[i].username, createdAt: "2015-10-24", mmrChange: 0});
+    data[i] = {username: apiData[i].username, values: []};
+    var k = 1;
+    for (var j = 0; j < 25; j++) {
+      if (j < 9) {
+        var date = '0' + (j + 1);
+      }
+      else {
+        var date = j + 1;
+      }
+      data[i].values[j] = {username: data[i].username, date: '2015-10-' + date};
+      if (j > 0 && k < apiData[i].Matches.length && data[i].values[j].date == apiData[i].Matches[k].createdAt) {
+        data[i].values[j].mmr = apiData[i].Matches[k].mmrChange + data[i].values[j-1].mmr;
+        k++;
+      }
+      else if (j === 0) {
+        data[i].values[j].mmr = 0;
+      }
+      else {
+        data[i].values[j].mmr = data[i].values[j-1].mmr;
+      }
     }
-    else {
-      return 0;
+    // console.log(data[i].values);
+    
+  }
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < data[i].values.length; j++) {
+      data[i].values[j].date = parseDate(data[i].values[j].date);
     }
-  })
-
   }
 
-  console.log(apiData)
-
+  console.log(data)
     data.forEach(function(d, i) {
     svg.append('path')
         .attr('d', lineGen(d.values))
