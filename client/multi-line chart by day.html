@@ -95,15 +95,14 @@ d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
     apiData[i].Matches.unshift({username: apiData[i].username, createdAt: "2015-10-01", mmrChange: 0});
       apiData[i].Matches.push({username: apiData[i].username, createdAt: "2015-10-24", mmrChange: 0});
     data[i] = {username: apiData[i].username, values: []};
-    var k = 1;
-    for (var j = 0; j < 25; j++) {
-      if (j < 9) {
-        var date = '0' + (j + 1);
-      }
-      else {
-        var date = j + 1;
-      }
-      data[i].values[j] = {username: data[i].username, date: '2015-10-' + date};
+    var now = new Date();
+    var date = new Date('2015-09-24');
+    var k = 0;
+    var j = 0;
+    while (now >= date) {
+      console.log(k)
+      date = new Date(date*1 + 86400000);
+      data[i].values[j] = {username: data[i].username, date: date.toISOString().slice(0,10)};
       if (j > 0 && k < apiData[i].Matches.length && data[i].values[j].date == apiData[i].Matches[k].createdAt) {
         data[i].values[j].mmr = apiData[i].Matches[k].mmrChange + data[i].values[j-1].mmr;
         k++;
@@ -114,6 +113,7 @@ d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
       else {
         data[i].values[j].mmr = data[i].values[j-1].mmr;
       }
+      j++;
     }
     // console.log(data[i].values);
     
