@@ -84,26 +84,26 @@ d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
       }
     })
     for (var j = 0; j < apiData[i].Matches.length; j++) {
-      apiData[i].Matches[j].createdAt = apiData[i].Matches[j].createdAt.slice(0,10);
+      apiData[i].Matches[j].startTime = apiData[i].Matches[j].startTime.slice(0,10);
       //make edge case for first one
-      if (j > 0 && apiData[i].Matches[j].createdAt === apiData[i].Matches[j-1].createdAt) {
+      if (j > 0 && apiData[i].Matches[j].startTime === apiData[i].Matches[j-1].startTime) {
         apiData[i].Matches[j-1].mmrChange += apiData[i].Matches[j].mmrChange;
         apiData[i].Matches.splice(j,1);
         j--;
       }
     }
-    apiData[i].Matches.unshift({username: apiData[i].username, createdAt: "2015-10-01", mmrChange: 0});
-      apiData[i].Matches.push({username: apiData[i].username, createdAt: "2015-10-24", mmrChange: 0});
+    // apiData[i].Matches.unshift({username: apiData[i].username, startTime: "2015-09-25", mmrChange: 0});
+    //   apiData[i].Matches.push({username: apiData[i].username, startTime: "2015-10-24", mmrChange: 0});
     data[i] = {username: apiData[i].username, values: []};
     var now = new Date();
-    var date = new Date('2015-09-24');
+    var date = new Date('2015-09-23');
     var k = 0;
     var j = 0;
     while (now >= date) {
       console.log(k)
       date = new Date(date*1 + 86400000);
       data[i].values[j] = {username: data[i].username, date: date.toISOString().slice(0,10)};
-      if (j > 0 && k < apiData[i].Matches.length && data[i].values[j].date == apiData[i].Matches[k].createdAt) {
+      if (j > 0 && k < apiData[i].Matches.length && data[i].values[j].date == apiData[i].Matches[k].startTime) {
         data[i].values[j].mmr = apiData[i].Matches[k].mmrChange + data[i].values[j-1].mmr;
         k++;
       }
