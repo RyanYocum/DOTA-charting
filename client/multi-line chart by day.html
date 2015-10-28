@@ -12,8 +12,8 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-    var mindate = new Date(2015,09,3),
-            maxdate = new Date(2015,09,21);
+    var mindate = new Date(2015,8,25),
+            maxdate = new Date();
 
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 
@@ -24,7 +24,7 @@ var xScale = d3.time.scale()
     .range([0, width]);
 
 var yScale = d3.scale.linear()
-    .domain([-100,200])
+    .domain([-150,300])
     .range([height, 0]);
 
 var xAxis = d3.svg.axis()
@@ -73,10 +73,10 @@ d3.json("http://novlovplov.xyz/api/accounts/", function(error, apiData) {
 
   for (var i = 0; i < apiData.length; i++) {
     apiData[i].Matches.sort(function (a,b) {
-      if (a.date > b.date) {
+      if (a.startTime > b.startTime) {
         return 1;
       }
-      if (a.date < b.date) {
+      if (a.startTime < b.startTime) {
         return -1;
       }
       else {
